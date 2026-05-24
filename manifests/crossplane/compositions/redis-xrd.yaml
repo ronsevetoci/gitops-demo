@@ -54,6 +54,12 @@ spec:
                     softwareVersion:
                       type: string
                       default: REDIS_7_0
+                    connectionConfigMapName:
+                      type: string
+                      default: demo-redis-connection
+                    connectionConfigMapNamespace:
+                      type: string
+                      default: demo
                   required:
                     - compartmentId
                     - subnetId

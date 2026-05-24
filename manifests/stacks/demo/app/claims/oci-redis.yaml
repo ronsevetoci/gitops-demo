@@ -1,4 +1,3 @@
-apiVersion: platform.example.org/v1alpha1
 kind: RedisInstance
 metadata:
   name: demo-redis
@@ -6,10 +5,6 @@ metadata:
 spec:
   compositionRef:
     name: oci-redisinstance
-
-  writeConnectionSecretToRef:
-    name: demo-redis-connection
-
   parameters:
     displayName: demo-redis
     compartmentId: ocid1.compartment.oc1..aaaaaaaayevnkjfyjb6nglndfrvgoy7hciclgf4kq7ioulokey7xfpixjhxa
@@ -17,3 +12,5 @@ spec:
     nodeCount: 1
     nodeMemoryInGbs: 2
     softwareVersion: REDIS_7_0
+    connectionConfigMapName: demo-redis-connection
+    connectionConfigMapNamespace: demo

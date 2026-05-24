@@ -2,6 +2,9 @@ apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: oci-redisinstance
+  labels:
+    provider: oci
+    service: redis
 spec:
   compositeTypeRef:
     apiVersion: platform.example.org/v1alpha1
@@ -16,7 +19,6 @@ spec:
       input:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
-
         resources:
           - name: redis-cluster
             base:
@@ -73,11 +75,50 @@ spec:
                 policy:
                   fromFieldPath: Optional
 
-            connectionDetails:
-              - name: REDIS_HOST
-                type: FromFieldPath
-                fromFieldPath: status.atProvider.primaryFqdn
+          - name: redis-connection-configmap
+            base:
+              apiVersion: kubernetes.m.crossplane.io/v1alpha1
+              kind: Object
+              metadata:
+                namespace: crossplane-system
+              spec:
+                providerConfigRef:
+                  name: in-cluster
+                  kind: ClusterProviderConfig
+                forProvider:
+                  manifest:
+                    apiVersion: v1
+                    kind: ConfigMap
+                    metadata:
+                      name: ""
+                      namespace: ""
+                    data:
+                      REDIS_HOST: ""
+                      REDIS_PORT: "6379"
+                      REDIS_URL: ""
 
-              - name: REDIS_PORT
-                type: FromValue
-                value: "6379"
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.connectionConfigMapName
+                toFieldPath: spec.forProvider.manifest.metadata.name
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.connectionConfigMapNamespace
+                toFieldPath: spec.forProvider.manifest.metadata.namespace
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: status.primaryFqdn
+                toFieldPath: spec.forProvider.manifest.data.REDIS_HOST
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: status.primaryFqdn
+                toFieldPath: spec.forProvider.manifest.data.REDIS_URL
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "redis://%s:6379"
+                policy:
+                  fromFieldPath: Optional
