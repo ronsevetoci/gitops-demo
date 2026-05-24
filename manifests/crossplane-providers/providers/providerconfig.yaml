@@ -102,6 +102,16 @@ spec:
     name: oci-workload-identity-runtime
 
 ---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-oci-redis
+  runtimeConfigRef:
+    name: oci-workload-identity-runtime
+spec:
+  package: ghcr.io/oracle/provider-oci-redis:v1.1.0
+
+---
 apiVersion: oci.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
