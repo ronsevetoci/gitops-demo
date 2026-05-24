@@ -48,7 +48,7 @@ spec:
       nodeClassRef:
         group: oci.oraclecloud.com
         kind: OCINodeClass
-        name: goldenimage
+        name: class1
       requirements:
         - key: "karpenter.sh/capacity-type"
           operator: In
@@ -86,7 +86,7 @@ spec:
 apiVersion: oci.oraclecloud.com/v1beta1
 kind: OCINodeClass
 metadata:
-  name: classA
+  name: class1
 spec:
   nodeCompartmentId: "ocid1.compartment.oc1..aaaaaaaayevnkjfyjb6nglndfrvgoy7hciclgf4kq7ioulokey7xfpixjhxa"
   metadata:
