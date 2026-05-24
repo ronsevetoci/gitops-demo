@@ -1,0 +1,4 @@
+curl -i \
+  -X POST http://localhost:50967/echo \
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello from OCI meetup","service":"redis-demo"}'
