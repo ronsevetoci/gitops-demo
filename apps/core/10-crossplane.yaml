@@ -11,8 +11,6 @@ spec:
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
     targetRevision: master
     path: apps/infra/crossplane
-    directory:
-      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

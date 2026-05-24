@@ -81,18 +81,6 @@ spec:
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-oci-containerengine
-  annotations:
-    argocd.argoproj.io/sync-wave: "11"
-spec:
-  package: ghcr.io/oracle/provider-oci-containerengine:<PROVIDER_VERSION>
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
-
----
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
   name: provider-oci-core
   annotations:
     argocd.argoproj.io/sync-wave: "11"
@@ -112,21 +100,6 @@ spec:
   package: ghcr.io/oracle/provider-oci-identity:<PROVIDER_VERSION>
   runtimeConfigRef:
     name: oci-workload-identity-runtime
-
----
-apiVersion: oci.m.upbound.io/v1beta1
-kind: ClusterProviderConfig
-metadata:
-  name: default
-  annotations:
-    argocd.argoproj.io/sync-wave: "20"
-spec:
-  credentials:
-    source: Secret
-    secretRef:
-      name: oci-creds
-      namespace: crossplane-system
-      key: credentials
 
 ---
 apiVersion: oci.upbound.io/v1beta1
