@@ -19,6 +19,23 @@ spec:
       input:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
+
+        writeConnectionSecretToRef:
+          namespace: crossplane-system
+          name: redis-connection
+          patches:
+            - type: FromCompositeFieldPath
+              fromFieldPath: spec.writeConnectionSecretToRef.name
+              toFieldPath: name
+              policy:
+                fromFieldPath: Optional
+
+            - type: FromCompositeFieldPath
+              fromFieldPath: metadata.namespace
+              toFieldPath: namespace
+              policy:
+                fromFieldPath: Optional
+
         resources:
           - name: redis-cluster
             base:

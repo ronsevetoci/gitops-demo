@@ -158,4 +158,4 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "25"
 spec:
-  package: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.8.2
+  package: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.10.0
