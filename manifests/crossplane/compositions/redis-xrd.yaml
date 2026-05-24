@@ -28,6 +28,14 @@ spec:
             spec:
               type: object
               properties:
+                writeConnectionSecretToRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                  required:
+                    - name
+
                 parameters:
                   type: object
                   properties:
