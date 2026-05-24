@@ -45,19 +45,16 @@ spec:
               value: {{ .Values.app.verboseByDefault | quote }}
             - name: REQUIRE_JSON
               value: {{ .Values.app.requireJSON | quote }}
-
-             - name: REDIS_HOST
+            - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
                   name: {{ .Values.connections.redis.configMapName | quote }}
                   key: {{ .Values.connections.redis.hostKey | quote }}
-
             - name: REDIS_PORT
               valueFrom:
                 configMapKeyRef:
                   name: {{ .Values.connections.redis.configMapName | quote }}
                   key: {{ .Values.connections.redis.portKey | quote }}
-
             - name: REDIS_ADDR
               value: "$(REDIS_HOST):$(REDIS_PORT)"
           command: ["/demo-api"]
