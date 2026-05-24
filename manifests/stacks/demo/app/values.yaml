@@ -14,9 +14,10 @@ service:
 # If you already have Secrets produced by Crossplane / KRO
 connections:
   redis:
-    secretName: demo-redis-conn
-    # keys expected in the secret:
-    hostKey: host
+    configMapName: demo-redis-connection
+    hostKey: REDIS_HOST
+    portKey: REDIS_PORT
+  
 
 app:
   sessionTTL: "24h"
