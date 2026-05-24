@@ -15,3 +15,5 @@ spec:
     softwareVersion: REDIS_7_0
     connectionConfigMapName: demo-redis-connection
     connectionConfigMapNamespace: demo
+    nsgIds:
+      - ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaan3so3df64lg2lpzubsut4fu437b3uwayjclkpkiymu7xjatecvjq
