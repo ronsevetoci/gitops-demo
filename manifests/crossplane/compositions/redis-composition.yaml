@@ -74,6 +74,9 @@ spec:
                 toFieldPath: status.primaryEndpointIpAddress
                 policy:
                   fromFieldPath: Optional
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.nsgIds
+                toFieldPath: spec.forProvider.nsgIds
 
           - name: redis-connection-configmap
             base:

@@ -60,6 +60,11 @@ spec:
                     connectionConfigMapNamespace:
                       type: string
                       default: demo
+                    nsgIds:
+                      type: array
+                      description: OCI Network Security Group OCIDs to attach to the Redis cluster
+                      items:
+                        type: string
                   required:
                     - compartmentId
                     - subnetId
