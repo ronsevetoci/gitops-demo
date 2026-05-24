@@ -1,0 +1,62 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xredisinstances.platform.example.org
+spec:
+  group: platform.example.org
+
+  names:
+    kind: XRedisInstance
+    plural: xredisinstances
+
+  claimNames:
+    kind: RedisInstance
+    plural: redisinstances
+
+  connectionSecretKeys:
+    - REDIS_HOST
+    - REDIS_PORT
+
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    compartmentId:
+                      type: string
+                    subnetId:
+                      type: string
+                    displayName:
+                      type: string
+                    nodeCount:
+                      type: integer
+                      default: 1
+                    nodeMemoryInGbs:
+                      type: integer
+                      default: 2
+                    softwareVersion:
+                      type: string
+                      default: REDIS_7_0
+                  required:
+                    - compartmentId
+                    - subnetId
+                    - displayName
+              required:
+                - parameters
+
+            status:
+              type: object
+              properties:
+                primaryFqdn:
+                  type: string
+                primaryEndpointIpAddress:
+                  type: string

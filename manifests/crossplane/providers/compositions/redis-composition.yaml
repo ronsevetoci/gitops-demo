@@ -1,0 +1,78 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: oci-redisinstance
+  labels:
+    provider: oci
+    service: redis
+spec:
+  compositeTypeRef:
+    apiVersion: platform.example.org/v1alpha1
+    kind: XRedisInstance
+
+  writeConnectionSecretsToNamespace: crossplane-system
+
+  resources:
+    - name: redis-cluster
+      base:
+        apiVersion: redis.oci.m.upbound.io/v1alpha1
+        kind: RedisCluster
+        metadata:
+          namespace: crossplane-system
+        spec:
+          forProvider:
+            compartmentId: ""
+            displayName: ""
+            nodeCount: 1
+            nodeMemoryInGbs: 2
+            softwareVersion: REDIS_7_0
+            subnetId: ""
+          providerConfigRef:
+            name: default
+            kind: ProviderConfig
+
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.compartmentId
+          toFieldPath: spec.forProvider.compartmentId
+
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.subnetId
+          toFieldPath: spec.forProvider.subnetId
+
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.displayName
+          toFieldPath: spec.forProvider.displayName
+
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.nodeCount
+          toFieldPath: spec.forProvider.nodeCount
+
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.nodeMemoryInGbs
+          toFieldPath: spec.forProvider.nodeMemoryInGbs
+
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.softwareVersion
+          toFieldPath: spec.forProvider.softwareVersion
+
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.primaryFqdn
+          toFieldPath: status.primaryFqdn
+          policy:
+            fromFieldPath: Optional
+
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.primaryEndpointIpAddress
+          toFieldPath: status.primaryEndpointIpAddress
+          policy:
+            fromFieldPath: Optional
+
+      connectionDetails:
+        - name: REDIS_HOST
+          type: FromFieldPath
+          fromFieldPath: status.atProvider.primaryFqdn
+
+        - name: REDIS_PORT
+          type: FromValue
+          value: "6379"
