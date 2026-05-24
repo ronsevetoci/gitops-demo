@@ -3,24 +3,35 @@ kind: Application
 metadata:
   name: envoy-gateway
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "15"
 spec:
-  project: default
+  project: platform
+
   source:
+    repoURL: oci://docker.io/envoyproxy
     chart: gateway-helm
-    repoURL: docker.io/envoyproxy
-    targetRevision: v0.0.0-latest
+    targetRevision: v1.8.0
     helm:
-      releaseName: envoy-gateway
+      releaseName: eg
       values: |
-        certgen:a
-          enabled: false
+        deployment:
+          envoyGateway:
+            nodeSelector:
+              oke.oraclecloud.com/pool.name: karpenter
+            tolerations:
+              - key: CriticalAddonsOnly
+                operator: Exists
+                effect: NoSchedule
+
   destination:
-    namespace: envoy-gateway-system
     server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+
   syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

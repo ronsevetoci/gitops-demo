@@ -1,5 +1,5 @@
 resources:
-  - 00-crds.yaml
+  #- 00-crds.yaml
   - 10-iam-policies.yaml
   - 20-envoyproxy.yaml
   #- 30-objects.yaml
