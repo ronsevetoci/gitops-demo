@@ -33,7 +33,7 @@ spec:
                 - name: OCI_RESOURCE_PRINCIPAL_VERSION
                   value: "2.2"
                 - name: OCI_RESOURCE_PRINCIPAL_REGION
-                  value: "eu-frankfurt-1"
+                  value: eu-frankfurt-1
                 - name: OCI_RESOURCE_PRINCIPAL_WORKLOAD_IDENTITY
                   value: "1"
 
@@ -106,12 +106,36 @@ apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-oci-redis
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
 spec:
   package: ghcr.io/oracle/provider-oci-redis:v1.1.0
+  runtimeConfigRef:
+    name: oci-workload-identity-runtime
 
 ---
+apiVersion: oci.m.upbound.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: oci-creds
+      namespace: crossplane-system
+      key: credentials
+
+---
+# Keep this only while you still use legacy cluster-scoped resources:
+#   *.oci.upbound.io
+#
+# Modern namespaced resources:
+#   *.oci.m.upbound.io
+# should use ClusterProviderConfig.oci.m.upbound.io above,
+# or a namespaced ProviderConfig.oci.m.upbound.io for per-namespace isolation.
 apiVersion: oci.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
@@ -125,6 +149,7 @@ spec:
       name: oci-creds
       namespace: crossplane-system
       key: credentials
+
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Function
@@ -133,4 +158,4 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "25"
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.8.2
+  package: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.8.2
