@@ -1,6 +1,0 @@
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-oci-redis
-spec:
-  package: ghcr.io/oracle/provider-oci-redis:v1.1.0
