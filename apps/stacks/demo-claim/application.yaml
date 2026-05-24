@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
     targetRevision: master
-    path: manifests/stacks/demo/claims
+    path: manifests/stacks/demo/app/claims
   destination:
     server: https://kubernetes.default.svc
     namespace: demo
