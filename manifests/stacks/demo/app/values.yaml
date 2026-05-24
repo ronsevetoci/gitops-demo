@@ -2,7 +2,7 @@ namespace: demo
 
 image:
   repository: fra.ocir.io/frsxwtjslf35/demo-api
-  tag: "0.2.3"
+  tag: "v0.3.0"
   pullPolicy: IfNotPresent
 
 replicaCount: 2
