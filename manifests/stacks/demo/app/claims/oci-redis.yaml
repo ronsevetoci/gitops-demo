@@ -1,3 +1,4 @@
+apiVersion: platform.example.org/v1alpha1
 kind: RedisInstance
 metadata:
   name: demo-redis
