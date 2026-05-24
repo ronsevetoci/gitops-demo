@@ -1,0 +1,117 @@
+# ---
+# apiVersion: karpenter.sh/v1
+# kind: NodePool
+# metadata:
+#   name: spot
+# spec:
+#   template:
+#     spec:
+#       taints:
+#         - key: oci.oraclecloud.com/oke-is-preemptible
+#           value: "true"
+#           effect: NoSchedule
+#       nodeClassRef:
+#         group: oci.oraclecloud.com
+#         kind: OCINodeClass
+#         name: class1
+#       requirements:
+#         - key: "karpenter.sh/capacity-type"
+#           operator: In
+#           values: ["spot"]
+#         - key: "oci.oraclecloud.com/instance-shape"
+#           operator: In
+#           values:
+#             - VM.Standard.E5.Flex
+#             - VM.Standard.E6.Flex
+#         - key: "kubernetes.io/arch"
+#           operator: In
+#           values: ["amd64"]
+#       terminationGracePeriod: 120m
+#   disruption:
+#     consolidationPolicy: WhenEmpty
+#     consolidateAfter: 60m
+#     budgets:
+#       - nodes: 5%
+#   limits:
+#     cpu: 64
+#     memory: 256Gi
+#   weight: 100
+
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: pool1
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: oci.oraclecloud.com
+        kind: OCINodeClass
+        name: goldenimage
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["on-demand"]
+        - key: "oci.oraclecloud.com/instance-shape"
+          operator: In
+          values:
+            - VM.Standard.E3.Flex
+            - VM.Standard.E4.Flex
+            - VM.Standard.E5.Flex
+            - VM.Standard.E6.Flex
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+
+      # Shorter for test cleanup.
+      terminationGracePeriod: 5m
+
+  disruption:
+    # Test pool: remove empty nodes quickly.
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 1m
+
+    # Allow more aggressive cleanup in test.
+    budgets:
+      - nodes: 50%
+
+  # Raise this based on expected test size.
+  # Example: 100 x 2-OCPU nodes = 200 CPU.
+  # Example: 100 x 4-OCPU nodes = 400 CPU.
+  limits:
+    cpu: 20
+    memory: 100Gi
+---
+apiVersion: oci.oraclecloud.com/v1beta1
+kind: OCINodeClass
+metadata:
+  name: classA
+spec:
+  nodeCompartmentId: "ocid1.compartment.oc1..aaaaaaaayevnkjfyjb6nglndfrvgoy7hciclgf4kq7ioulokey7xfpixjhxa"
+  metadata:
+    user_data: "IyEvdXNyL2Jpbi9lbnYgYmFzaApzZXQgLWUKCmVjaG8gIkZldGNoaW5nIG1ldGFkYXRhLi4uIgoKSU5TVEFOQ0VfSlNPTj0kKGN1cmwgLXNmTCAtbSA1IC0tcmV0cnkgMyBcCiAgLUggIkF1dGhvcml6YXRpb246IEJlYXJlciBPcmFjbGUiIFwKICAiaHR0cDovLzE2OS4yNTQuMTY5LjI1NC9vcGMvdjIvaW5zdGFuY2UiKQoKIyAtLS0gRXh0cmFjdCBtZXRhZGF0YSAtLS0KQVBJU0VSVkVSPSQoZWNobyAiJElOU1RBTkNFX0pTT04iIHwganEgLXIgJy5tZXRhZGF0YS5hcGlzZXJ2ZXJfaG9zdCcpCkNBX0NFUlQ9JChlY2hvICIkSU5TVEFOQ0VfSlNPTiIgfCBqcSAtciAnLm1ldGFkYXRhLmNsdXN0ZXJfY2FfY2VydCcpCkROUz0kKGVjaG8gIiRJTlNUQU5DRV9KU09OIiB8IGpxIC1yICcubWV0YWRhdGEuY2x1c3Rlcl9kbnMgLy8gIjEwLjk2LjAuMTAiJykKCiMgLS0tIEFkZCBrdWJlbGV0IHR1bmluZyAoTkVXKSAtLS0KS1VCRUxFVF9BUkdTPSJcCi0ta3ViZS1yZXNlcnZlZD1jcHU9NzBtLG1lbW9yeT0xR2kgXAotLXN5c3RlbS1yZXNlcnZlZD1jcHU9MTAwbSxtZW1vcnk9MjU2TWkgXAotLWV2aWN0aW9uLWhhcmQ9bWVtb3J5LmF2YWlsYWJsZTw1MDBNaSIKCiMgLS0tIEJhY2tncm91bmQgcHJlLXB1bGwgKHVuY2hhbmdlZCkgLS0tCmVjaG8gIlN0YXJ0aW5nIGJhY2tncm91bmQgaW1hZ2UgcHVsbHMuLi4iCgpub2h1cCBjcmljdGwgcHVsbCBldS1mcmFua2Z1cnQtMS5vY2lyLmlvL2F4b3hkaWV2ZGE1ai9va2UtcHVibGljLXBhdXNlOmxhdGVzdCA+L2Rldi9udWxsIDI+JjEgJgpub2h1cCBjcmljdGwgcHVsbCBldS1mcmFua2Z1cnQtMS5vY2lyLmlvL2lkOXk2bWk4dGNreS9va2UtcHVibGljLXZjbi1uYXRpdmUtaXAtY25pLXBsdWdpbjpsYXRlc3QgPi9kZXYvbnVsbCAyPiYxICYKbm9odXAgY3JpY3RsIHB1bGwgZXUtZnJhbmtmdXJ0LTEub2Npci5pby9pZDl5Nm1pOHRja3kvb2tlLXB1YmxpYy1rdWJlLXByb3h5OmxhdGVzdCA+L2Rldi9udWxsIDI+JjEgJgoKIyAtLS0gTGF1bmNoIGluc3RhbGxlciAoZW5oYW5jZWQpIC0tLQplY2hvICJMYXVuY2hpbmcgT0tFIGluc3RhbGxlci4uLiIKCmJhc2ggL2V0Yy9va2Uvb2tlLWluc3RhbGwuc2ggXAogIC0tYXBpc2VydmVyLWVuZHBvaW50ICIke0FQSVNFUlZFUn0iIFwKICAtLWt1YmVsZXQtY2EtY2VydCAiJHtDQV9DRVJUfSIgXAogIC0tY2x1c3Rlci1kbnMgIiR7RE5TfSIgXAogIC0ta3ViZWxldC1leHRyYS1hcmdzICIke0tVQkVMRVRfQVJHU30iCgplY2hvICJCb290c3RyYXAgbG9naWMgY29tcGxldGUuIg=="
+  shapeConfigs:
+    - ocpus: 1
+      memoryInGbs: 4
+    - ocpus: 2
+      memoryInGbs: 8
+    - ocpus: 4
+      memoryInGbs: 16
+  volumeConfig:
+    bootVolumeConfig:
+       imageConfig:
+        imageType: OKEImage
+        imageId: "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaoueekikb5aobkccrctvrg7bukuw5bicd222tt6nv22ojzmkqea7q"
+  networkConfig:
+    primaryVnicConfig:
+      networkSecurityGroupConfigs:
+        - networkSecurityGroupId: ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaan3so3df64lg2lpzubsut4fu437b3uwayjclkpkiymu7xjatecvjq
+      subnetConfig:
+        subnetId: ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaahwjd57to4sdamx4tjkz2fxwymxdivb5zk6pfuwkiauvscgf5ywdq
+    secondaryVnicConfigs:
+      - networkSecurityGroupConfigs:
+          - networkSecurityGroupId: ocid1.networksecuritygroup.oc1.eu-frankfurt-1.aaaaaaaagpgbuvfknthclsnhvn26yfsnacjjuvt42jxkn6dvma4eghylwffq
+        subnetConfig:
+          subnetId: ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaa2jo64gdsywfmk2cq3c62fykegcqhyyv52y3iawtryhgw2qtcgkrq
+        ipCount: 64

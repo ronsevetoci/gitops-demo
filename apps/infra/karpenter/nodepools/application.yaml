@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter-nodepools
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "7"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/ronsevetoci/gitops-demo.git
+    targetRevision: main
+    path: manifests/karpenter-nodepools
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: karpenter
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      # - CreateNamespace=true
+      # Helpful when CRDs/webhooks are still being established during bootstrap:
+      - SkipDryRunOnMissingResource=true

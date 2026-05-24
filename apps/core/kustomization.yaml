@@ -1,0 +1,6 @@
+resources:
+  - 00-platform.yaml
+  - 05-karpenter.yaml
+  - 10-crossplane.yaml
+  #- 15-gatewayapi.yaml
+  # - 100-stacks.yaml
