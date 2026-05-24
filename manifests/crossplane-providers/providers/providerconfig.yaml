@@ -61,7 +61,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "10"
 spec:
-  package: ghcr.io/oracle/provider-family-oci:<PROVIDER_VERSION>
+  package: ghcr.io/oracle/provider-family-oci:v1.1.0
   runtimeConfigRef:
     name: oci-workload-identity-runtime
 
@@ -73,7 +73,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "11"
 spec:
-  package: ghcr.io/oracle/provider-oci-objectstorage:<PROVIDER_VERSION>
+  package: ghcr.io/oracle/provider-oci-objectstorage:v1.1.0
   runtimeConfigRef:
     name: oci-workload-identity-runtime
 
@@ -85,7 +85,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "11"
 spec:
-  package: ghcr.io/oracle/provider-oci-core:<PROVIDER_VERSION>
+  package: ghcr.io/oracle/provider-oci-core:v1.1.0
   runtimeConfigRef:
     name: oci-workload-identity-runtime
 
@@ -97,7 +97,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "11"
 spec:
-  package: ghcr.io/oracle/provider-oci-identity:<PROVIDER_VERSION>
+  package: ghcr.io/oracle/provider-oci-identity:v1.1.0
   runtimeConfigRef:
     name: oci-workload-identity-runtime
 
