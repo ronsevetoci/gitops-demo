@@ -8,7 +8,7 @@ spec:
   source:
     path: apps/core
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
-    targetRevision: main
+    targetRevision: master
   destination:
     namespace: argocd
     server: 'https://kubernetes.default.svc'

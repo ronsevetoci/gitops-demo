@@ -9,7 +9,7 @@ spec:
   project: platform
   source:
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
-    targetRevision: main
+    targetRevision: master
     path: manifests/crossplane-providers/providers
   destination:
     server: https://kubernetes.default.svc

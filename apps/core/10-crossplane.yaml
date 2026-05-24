@@ -9,7 +9,7 @@ spec:
   project: platform
   source:
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
-    targetRevision: main
+    targetRevision: master
     path: apps/infra/crossplane
     directory:
       recurse: true
