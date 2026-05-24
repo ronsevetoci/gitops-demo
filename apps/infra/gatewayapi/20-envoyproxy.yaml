@@ -14,15 +14,6 @@ spec:
     targetRevision: v1.8.0
     helm:
       releaseName: eg
-      values: |
-        deployment:
-          envoyGateway:
-            nodeSelector:
-              oke.oraclecloud.com/pool.name: karpenter
-            tolerations:
-              - key: CriticalAddonsOnly
-                operator: Exists
-                effect: NoSchedule
 
   destination:
     server: https://kubernetes.default.svc
