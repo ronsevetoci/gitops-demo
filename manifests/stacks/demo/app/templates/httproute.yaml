@@ -9,8 +9,6 @@ spec:
   parentRefs:
     - name: public-gateway
       namespace: demo
-  hostnames:
-    - demo.example.com
   rules:
     - matches:
         - path:
