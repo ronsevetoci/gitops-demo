@@ -1,0 +1,33 @@
+{{- if .Values.components.karpenterNodepools.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter-nodepools
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.components.karpenterNodepools.syncWave | quote }}
+spec:
+  project: {{ .Values.argocd.project }}
+  source:
+    repoURL: {{ .Values.repoURL }}
+    targetRevision: {{ .Values.targetRevision }}
+    path: manifests/karpenter-nodepools-helm
+    helm:
+      releaseName: karpenter-nodepools
+      values: |
+        nodeClass:
+          compartmentId: {{ .Values.oci.karpenter.nodeCompartmentId | quote }}
+          primarySubnetId: {{ .Values.oci.karpenter.primarySubnetId | quote }}
+          secondarySubnetId: {{ .Values.oci.karpenter.secondarySubnetId | quote }}
+          primaryNsgId: {{ .Values.oci.karpenter.primaryNsgId | quote }}
+          secondaryNsgId: {{ .Values.oci.karpenter.secondaryNsgId | quote }}
+  destination:
+    server: {{ .Values.argocd.destination.server }}
+    namespace: karpenter
+  syncPolicy:
+    automated:
+      prune: {{ .Values.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.syncPolicy.automated.selfHeal }}
+    syncOptions:
+      - SkipDryRunOnMissingResource=true
+{{- end }}

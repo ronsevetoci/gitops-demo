@@ -1,0 +1,21 @@
+apiVersion: platform.example.org/v1alpha1
+kind: RedisInstance
+metadata:
+  name: demo-redis
+  namespace: {{ .Values.demo.namespace }}
+spec:
+  compositionRef:
+    name: oci-redisinstance
+  parameters:
+    displayName: {{ .Values.demo.redis.displayName | quote }}
+    compartmentId: {{ .Values.demo.redis.compartmentId | quote }}
+    subnetId: {{ .Values.demo.redis.subnetId | quote }}
+    nodeCount: {{ .Values.demo.redis.nodeCount }}
+    nodeMemoryInGbs: {{ .Values.demo.redis.nodeMemoryInGbs }}
+    softwareVersion: {{ .Values.demo.redis.softwareVersion | quote }}
+    connectionConfigMapName: {{ .Values.demo.redis.configMapName | quote }}
+    connectionConfigMapNamespace: {{ .Values.demo.namespace | quote }}
+    nsgIds:
+      {{- range .Values.demo.redis.nsgIds }}
+      - {{ . | quote }}
+      {{- end }}

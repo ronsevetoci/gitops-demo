@@ -1,0 +1,64 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: pool1
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: oci.oraclecloud.com
+        kind: OCINodeClass
+        name: class1
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["{{ .Values.nodePool.capacityType }}"]
+        - key: "oci.oraclecloud.com/instance-shape"
+          operator: In
+          values:
+            {{- range .Values.nodePool.instanceShapes }}
+            - {{ . }}
+            {{- end }}
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+      terminationGracePeriod: {{ .Values.nodePool.terminationGracePeriod }}
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: {{ .Values.nodePool.consolidateAfter }}
+    budgets:
+      - nodes: {{ .Values.nodePool.budgetNodes }}
+  limits:
+    cpu: {{ .Values.nodePool.limitsCpu }}
+    memory: {{ .Values.nodePool.limitsMemory }}
+---
+apiVersion: oci.oraclecloud.com/v1beta1
+kind: OCINodeClass
+metadata:
+  name: class1
+spec:
+  nodeCompartmentId: {{ .Values.nodeClass.compartmentId | quote }}
+  shapeConfigs:
+    {{- range .Values.nodeClass.nodeShapes }}
+    - ocpus: {{ .ocpus }}
+      memoryInGbs: {{ .memoryInGbs }}
+    {{- end }}
+  volumeConfig:
+    bootVolumeConfig:
+      imageConfig:
+        imageType: OKEImage
+        imageFilter:
+          osFilter: "Oracle Linux"
+          osVersionFilter: {{ .Values.nodeClass.osVersion | quote }}
+  networkConfig:
+    primaryVnicConfig:
+      networkSecurityGroupConfigs:
+        - networkSecurityGroupId: {{ .Values.nodeClass.primaryNsgId | quote }}
+      subnetConfig:
+        subnetId: {{ .Values.nodeClass.primarySubnetId | quote }}
+    secondaryVnicConfigs:
+      - networkSecurityGroupConfigs:
+          - networkSecurityGroupId: {{ .Values.nodeClass.secondaryNsgId | quote }}
+        subnetConfig:
+          subnetId: {{ .Values.nodeClass.secondarySubnetId | quote }}
+        ipCount: 16

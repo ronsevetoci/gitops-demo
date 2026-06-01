@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .Values.argocd.project }}
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  description: Platform components (Karpenter, Crossplane, OCI Provider, Gateway, Demo)
+  sourceRepos:
+    {{- range .Values.argocd.sourceRepos }}
+    - {{ . | quote }}
+    {{- end }}
+  destinations:
+    - namespace: "*"
+      server: {{ .Values.argocd.destination.server }}
+  clusterResourceWhitelist:
+    {{- range .Values.argocd.clusterResourceWhitelist }}
+    - group: {{ .group | quote }}
+      kind: {{ .kind | quote }}
+    {{- end }}
+  namespaceResourceWhitelist:
+    {{- range .Values.argocd.namespaceResourceWhitelist }}
+    - group: {{ .group | quote }}
+      kind: {{ .kind | quote }}
+    {{- end }}

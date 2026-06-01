@@ -1,4 +1,0 @@
-resources:
-  - 00-crossplane-system.yaml
-  - 10-provider.yaml
-  - 20-compositions.yaml

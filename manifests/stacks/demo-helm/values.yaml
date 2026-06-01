@@ -1,0 +1,11 @@
+demo:
+  namespace: demo
+  redis:
+    compartmentId: ""
+    subnetId: ""
+    nsgIds: []
+    displayName: "demo-redis"
+    nodeCount: 1
+    nodeMemoryInGbs: 2
+    softwareVersion: "REDIS_7_0"
+    configMapName: "demo-redis-connection"

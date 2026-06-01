@@ -1,4 +1,4 @@
----
+# RBAC: ServiceAccount + ClusterRole for OCI provider
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -8,12 +8,44 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: crossplane-provider-oci
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: crossplane-provider-oci
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: crossplane-provider-oci
+subjects:
+  - kind: ServiceAccount
+    name: crossplane-provider-oci
+    namespace: crossplane-system
+
+---
+# Workload Identity runtime for OCI providers
 apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
 metadata:
   name: oci-workload-identity-runtime
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   deploymentTemplate:
     spec:
@@ -32,94 +64,68 @@ spec:
               env:
                 - name: OCI_RESOURCE_PRINCIPAL_VERSION
                   value: "2.2"
-                - name: OCI_RESOURCE_PRINCIPAL_REGION
-                  value: eu-frankfurt-1
                 - name: OCI_RESOURCE_PRINCIPAL_WORKLOAD_IDENTITY
                   value: "1"
 
 ---
+# OCI Credentials via Workload Identity (no credentials needed)
 apiVersion: v1
 kind: Secret
 metadata:
   name: oci-creds
   namespace: crossplane-system
   annotations:
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "1"
 type: Opaque
 stringData:
   credentials: |
     {
-      "auth": "OKEWorkloadIdentity",
-      "region": "eu-frankfurt-1"
+      "auth": "OKEWorkloadIdentity"
     }
 
 ---
+# Family OCI provider (covers all OCI resources)
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: oracle-provider-family-oci
+  name: provider-family-oci
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   package: ghcr.io/oracle/provider-family-oci:v1.1.0
   runtimeConfigRef:
     name: oci-workload-identity-runtime
 
 ---
+# Kubernetes provider for in-cluster resources (ConfigMaps, etc)
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-oci-objectstorage
+  name: provider-kubernetes
   annotations:
-    argocd.argoproj.io/sync-wave: "11"
+    argocd.argoproj.io/sync-wave: "5"
 spec:
-  package: ghcr.io/oracle/provider-oci-objectstorage:v1.1.0
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
+  package: ghcr.io/crossplane-contrib/provider-kubernetes:v0.14.0
 
 ---
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
+# Composition Functions (required for pipeline mode compositions)
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
 metadata:
-  name: provider-oci-core
+  name: function-patch-and-transform
   annotations:
-    argocd.argoproj.io/sync-wave: "11"
+    argocd.argoproj.io/sync-wave: "5"
 spec:
-  package: ghcr.io/oracle/provider-oci-core:v1.1.0
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
+  package: ghcr.io/crossplane/function-patch-and-transform:v0.2.1
 
 ---
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-oci-identity
-  annotations:
-    argocd.argoproj.io/sync-wave: "11"
-spec:
-  package: ghcr.io/oracle/provider-oci-identity:v1.1.0
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
-
----
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-oci-redis
-  annotations:
-    argocd.argoproj.io/sync-wave: "11"
-spec:
-  package: ghcr.io/oracle/provider-oci-redis:v1.1.0
-  runtimeConfigRef:
-    name: oci-workload-identity-runtime
-
----
+# OCI ProviderConfig (modern namespaced, workload identity)
 apiVersion: oci.m.upbound.io/v1beta1
-kind: ClusterProviderConfig
+kind: ProviderConfig
 metadata:
   name: default
   annotations:
-    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   credentials:
     source: Secret
@@ -129,25 +135,16 @@ spec:
       key: credentials
 
 ---
-# Keep this only while you still use legacy cluster-scoped resources:
-#   *.oci.upbound.io
-#
-# Modern namespaced resources:
-#   *.oci.m.upbound.io
-# should use ClusterProviderConfig.oci.m.upbound.io above,
-# or a namespaced ProviderConfig.oci.m.upbound.io for per-namespace isolation.
-apiVersion: oci.upbound.io/v1beta1
+# In-cluster Kubernetes ProviderConfig
+apiVersion: kubernetes.crossplane.io/v1alpha1
 kind: ProviderConfig
 metadata:
-  name: default
+  name: in-cluster
   annotations:
-    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   credentials:
-    source: Secret
-    secretRef:
-      name: oci-creds
-      namespace: crossplane-system
+    source: InjectedIdentity
       key: credentials
 
 ---

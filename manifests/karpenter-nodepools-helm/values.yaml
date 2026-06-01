@@ -1,0 +1,29 @@
+# This values file is not used directly; values come from the parent app-of-apps chart
+# via Argo CD Application values override or external values injection
+nodeClass:
+  compartmentId: ""
+  primarySubnetId: ""
+  secondarySubnetId: ""
+  primaryNsgId: ""
+  secondaryNsgId: ""
+  osVersion: "8"
+  nodeShapes:
+    - ocpus: 1
+      memoryInGbs: 4
+    - ocpus: 2
+      memoryInGbs: 8
+    - ocpus: 4
+      memoryInGbs: 16
+
+nodePool:
+  capacityType: "on-demand"
+  instanceShapes:
+    - VM.Standard.E3.Flex
+    - VM.Standard.E4.Flex
+    - VM.Standard.E5.Flex
+    - VM.Standard.E6.Flex
+  terminationGracePeriod: 5m
+  consolidateAfter: 1m
+  budgetNodes: 50%
+  limitsCpu: 20
+  limitsMemory: 100Gi

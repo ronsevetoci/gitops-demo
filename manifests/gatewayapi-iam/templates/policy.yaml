@@ -1,0 +1,13 @@
+apiVersion: identity.oci.upbound.io/v1alpha1
+kind: Policy
+metadata:
+  name: pol-gateway-open
+spec:
+  forProvider:
+    compartmentId: {{ .Values.compartmentId | quote }}
+    name: pol-gateway-open
+    description: "Gateway/Ingress controller policy (demo, minimal)"
+    statements:
+      - "Allow any-user to manage load-balancers in compartment {{ .Values.compartmentName }}"
+      - "Allow any-user to manage virtual-network-family in compartment {{ .Values.compartmentName }}"
+      - "Allow any-user to manage network-security-groups in compartment {{ .Values.compartmentName }}"

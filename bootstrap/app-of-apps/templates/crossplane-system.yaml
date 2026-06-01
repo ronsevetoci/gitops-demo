@@ -1,0 +1,33 @@
+{{- if .Values.components.crossplaneSystem.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crossplane-system
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.components.crossplaneSystem.syncWave | quote }}
+spec:
+  project: {{ .Values.argocd.project }}
+  source:
+    repoURL: {{ .Values.charts.crossplane.repoURL }}
+    chart: {{ .Values.charts.crossplane.chart }}
+    targetRevision: {{ .Values.charts.crossplane.version }}
+    helm:
+      releaseName: crossplane
+      values: |
+        nodeSelector:
+          oke.oraclecloud.com/pool.name: karpenter
+        tolerations:
+          - key: CriticalAddonsOnly
+            operator: Exists
+            effect: NoSchedule
+  destination:
+    server: {{ .Values.argocd.destination.server }}
+    namespace: crossplane-system
+  syncPolicy:
+    automated:
+      prune: {{ .Values.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.syncPolicy.automated.selfHeal }}
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}

@@ -5,6 +5,8 @@ metadata:
   labels:
     provider: oci
     service: redis
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
 spec:
   compositeTypeRef:
     apiVersion: platform.example.org/v1alpha1
@@ -20,6 +22,7 @@ spec:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
         resources:
+          # OCI Redis Cluster
           - name: redis-cluster
             base:
               apiVersion: redis.oci.m.upbound.io/v1alpha1
@@ -27,6 +30,8 @@ spec:
               metadata:
                 namespace: crossplane-system
               spec:
+                managementPolicies:
+                  - "*"
                 forProvider:
                   compartmentId: ""
                   displayName: ""
@@ -34,9 +39,9 @@ spec:
                   nodeMemoryInGbs: 2
                   softwareVersion: REDIS_7_0
                   subnetId: ""
+                  nsgIds: []
                 providerConfigRef:
                   name: default
-                  kind: ClusterProviderConfig
 
             patches:
               - type: FromCompositeFieldPath
@@ -63,6 +68,11 @@ spec:
                 fromFieldPath: spec.parameters.softwareVersion
                 toFieldPath: spec.forProvider.softwareVersion
 
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.nsgIds
+                toFieldPath: spec.forProvider.nsgIds
+
+              # Export Redis connection info
               - type: ToCompositeFieldPath
                 fromFieldPath: status.atProvider.primaryFqdn
                 toFieldPath: status.primaryFqdn
@@ -74,27 +84,26 @@ spec:
                 toFieldPath: status.primaryEndpointIpAddress
                 policy:
                   fromFieldPath: Optional
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.nsgIds
-                toFieldPath: spec.forProvider.nsgIds
 
+          # ConfigMap with Redis connection details
           - name: redis-connection-configmap
             base:
-              apiVersion: kubernetes.m.crossplane.io/v1alpha1
+              apiVersion: kubernetes.crossplane.io/v1alpha1
               kind: Object
               metadata:
                 namespace: crossplane-system
               spec:
+                managementPolicies:
+                  - "*"
                 providerConfigRef:
                   name: in-cluster
-                  kind: ClusterProviderConfig
                 forProvider:
                   manifest:
                     apiVersion: v1
                     kind: ConfigMap
                     metadata:
                       name: ""
-                      namespace: ""
+                      namespace: demo
                     data:
                       REDIS_HOST: ""
                       REDIS_PORT: "6379"

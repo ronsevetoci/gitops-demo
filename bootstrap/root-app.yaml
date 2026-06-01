@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    path: apps/core
+    path: bootstrap/app-of-apps
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
     targetRevision: master
   destination:

@@ -1,0 +1,37 @@
+{{- if .Values.components.stacks.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-stack-helm
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.components.stacks.syncWave | quote }}
+spec:
+  project: {{ .Values.argocd.project }}
+  source:
+    repoURL: {{ .Values.repoURL }}
+    targetRevision: {{ .Values.targetRevision }}
+    path: manifests/stacks/demo-helm
+    helm:
+      releaseName: demo-stack
+      values: |
+        demo:
+          namespace: demo
+          redis:
+            compartmentId: {{ .Values.oci.stacks.demo.compartmentId | quote }}
+            subnetId: {{ .Values.oci.stacks.demo.redisSubnetId | quote }}
+            nsgIds:
+              - {{ .Values.oci.stacks.demo.redisNsgId | quote }}
+  destination:
+    server: {{ .Values.argocd.destination.server }}
+    namespace: demo
+  syncPolicy:
+    automated:
+      prune: {{ .Values.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.syncPolicy.automated.selfHeal }}
+    syncOptions:
+      - CreateNamespace=true
+      {{- range .Values.syncPolicy.syncOptions }}
+      - {{ . }}
+      {{- end }}
+{{- end }}

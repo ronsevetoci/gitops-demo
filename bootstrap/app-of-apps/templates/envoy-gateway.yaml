@@ -1,0 +1,27 @@
+{{- if .Values.components.envoyGateway.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .Values.components.envoyGateway.syncWave | quote }}
+spec:
+  project: {{ .Values.argocd.project }}
+  source:
+    repoURL: {{ .Values.charts.envoyGateway.repoURL }}
+    chart: {{ .Values.charts.envoyGateway.chart }}
+    targetRevision: {{ .Values.charts.envoyGateway.version }}
+    helm:
+      releaseName: eg
+  destination:
+    server: {{ .Values.argocd.destination.server }}
+    namespace: envoy-gateway-system
+  syncPolicy:
+    automated:
+      prune: {{ .Values.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.syncPolicy.automated.selfHeal }}
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}
