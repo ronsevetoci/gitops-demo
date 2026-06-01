@@ -9,9 +9,9 @@ metadata:
 spec:
   project: {{ .Values.argocd.project }}
   source:
-    repoURL: {{ .Values.charts.crossplane.repoURL }}
-    chart: {{ .Values.charts.crossplane.chart }}
-    targetRevision: {{ .Values.charts.crossplane.version }}
+    repoURL: {{ .Values.charts.crossplane.repoURL | quote }}
+    chart: {{ .Values.charts.crossplane.chart | quote }}
+    targetRevision: {{ .Values.charts.crossplane.version | quote }}
     helm:
       releaseName: crossplane
       values: |

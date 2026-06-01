@@ -8,7 +8,7 @@ spec:
   source:
     path: bootstrap/app-of-apps
     repoURL: https://github.com/ronsevetoci/gitops-demo.git
-    targetRevision: master
+    targetRevision: demo-overlay
   destination:
     namespace: argocd
     server: 'https://kubernetes.default.svc'
