@@ -102,7 +102,9 @@ spec:
     bootVolumeConfig:
        imageConfig:
         imageType: OKEImage
-        imageId: "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaoueekikb5aobkccrctvrg7bukuw5bicd222tt6nv22ojzmkqea7q"
+        imageFilter:
+          osFilter: "Oracle Linux"
+          osVersionFilter: "8"  # see OCINodeClass docs for imageFilter behavior
   networkConfig:
     primaryVnicConfig:
       networkSecurityGroupConfigs:
