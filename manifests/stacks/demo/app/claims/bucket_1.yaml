@@ -1,0 +1,17 @@
+apiVersion: objectstorage.oci.m.upbound.io/v1alpha1
+kind: Bucket
+metadata:
+  name: demo-crossplane-bucket-1
+  namespace: demo
+  labels:
+    demo: crossplane-oci
+spec:
+  forProvider:
+    compartmentId: ocid1.compartment.oc1..aaaaaaaayevnkjfyjb6nglndfrvgoy7hciclgf4kq7ioulokey7xfpixjhxa
+    namespace: frsxwtjslf35
+    name: gitops-demo-bucket-rs-20260602-1
+    accessType: NoPublicAccess
+    storageTier: Standard
+  providerConfigRef:
+    kind: ClusterProviderConfig
+    name: default
