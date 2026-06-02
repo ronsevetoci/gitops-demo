@@ -7,7 +7,7 @@ metadata:
     demo: crossplane-oci
 spec:
   forProvider:
-    compartmentId: ocid1.compartment.oc1..aaaaaaaacfzpdmdv7quupjqou5me4db4wesmdbjh64oyrsxqg4fjgnnqtixq
+    compartmentId: ocid1.compartment.oc1..aaaaaaaayevnkjfyjb6nglndfrvgoy7hciclgf4kq7ioulokey7xfpixjhxa
     namespace: frsxwtjslf35
     name: gitops-demo-bucket-rs-20260602
     accessType: NoPublicAccess
