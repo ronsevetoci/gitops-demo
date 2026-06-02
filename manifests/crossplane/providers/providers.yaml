@@ -50,7 +50,10 @@ stringData:
   credentials: |
     {
       "auth": "OKEWorkloadIdentity",
-      "region": "eu-frankfurt-1"
+      "region": "eu-frankfurt-1",
+      "ignore_defined_tags": [
+      "oraemeaappdev_default_tags.schedule"
+      ]
     }
 
 ---
