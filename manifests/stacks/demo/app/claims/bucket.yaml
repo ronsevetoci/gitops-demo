@@ -9,7 +9,7 @@ spec:
   forProvider:
     compartmentId: ocid1.compartment.oc1..aaaaaaaacfzpdmdv7quupjqou5me4db4wesmdbjh64oyrsxqg4fjgnnqtixq
     namespace: frsxwtjslf35
-    name: gitops-demo-bucket
+    name: gitops-demo-bucket-rs-20260602
     accessType: NoPublicAccess
     storageTier: Standard
   providerConfigRef:
