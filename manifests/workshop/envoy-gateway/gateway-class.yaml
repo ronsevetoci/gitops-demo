@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: workshop-envoy-oci
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: workshop-oci-lb
+    namespace: envoy-gateway-system

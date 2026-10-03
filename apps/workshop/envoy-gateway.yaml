@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: workshop-envoy-gateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: workshop
+  source:
+    repoURL: https://github.com/ronsevetoci/gitops-demo.git
+    targetRevision: workshop
+    path: manifests/workshop/envoy-gateway
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: workshop-envoy
+  syncPolicy: {}

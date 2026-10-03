@@ -1,0 +1,7 @@
+resources:
+  - namespace.yaml
+  - envoy-proxy.yaml
+  - gateway-class.yaml
+  - demo.yaml
+  - gateway.yaml
+  - http-route.yaml

@@ -1,0 +1,25 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: workshop-oci-lb
+  namespace: envoy-gateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: LoadBalancer
+        allocateLoadBalancerNodePorts: false
+        annotations:
+          oci.oraclecloud.com/load-balancer-type: "lb"
+          service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+          service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+          service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
+          oci.oraclecloud.com/security-rule-management-mode: "NSG"
+          # If the cluster has no default backend NSG, add the annotation below
+          # in an instructor-private overlay after replacing the placeholder.
+          # oci.oraclecloud.com/oci-backend-network-security-group: "<BACKEND_NSG_OCID>"
+          # Optional dedicated LB subnet in the same private overlay:
+          # service.beta.kubernetes.io/oci-load-balancer-subnet1: "<LB_SUBNET_OCID>"
